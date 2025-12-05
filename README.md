@@ -1,118 +1,120 @@
-# 🧱 Breakout: x86 Assembly & SDL3 Hybrid Engine
+# 🧱 Breakout - Proyecto Final (OyAC)
 
 ![Language](https://img.shields.io/badge/Language-C%20%2F%20ASM%20(x86)-blue?style=for-the-badge&logo=c)
 ![Library](https://img.shields.io/badge/Library-SDL3-EA312F?style=for-the-badge&logo=sdl)
 ![IDE](https://img.shields.io/badge/IDE-Visual%20Studio%202022-5C2D91?style=for-the-badge&logo=visual-studio)
 ![Academic](https://img.shields.io/badge/Course-Org.%20y%20Arq.%20de%20Computadoras-green?style=for-the-badge)
 
-> **Un clon avanzado de Breakout optimizado a bajo nivel.**
-> Este proyecto demuestra la integración eficiente entre **C (para gestión de medios)** y **Ensamblador x86 (para lógica crítica)**, logrando un control total sobre la física y el rendimiento.
+Un clon avanzado del clásico juego **Breakout** desarrollado en **C** puro y **SDL3**, destacando por su motor híbrido: **toda la lógica crítica (física, colisiones, máquina de estados y algoritmos de ordenamiento) está implementada nativamente en Lenguaje Ensamblador (MASM x86).**
 
----
+A diferencia de implementaciones estándar, aquí **no se utilizan librerías de física**. Toda la detección de colisiones, cálculo de trayectorias, ordenamiento de puntajes y lógica de juego ha sido escrita a mano en bloques de ensamblador en línea (`__asm`), utilizando la FPU (Floating Point Unit) para una precisión matemática superior.
 
-## 📖 Descripción del Proyecto
+## 📸 Capturas de Pantalla
 
-Desarrollado como proyecto final para la materia de **Organización y Arquitectura de Computadoras** en la **UABC**, este juego no es solo una recreación visual; es una implementación técnica que delega las tareas computacionales intensivas directamente al procesador mediante instrucciones nativas.
-
-A diferencia de implementaciones estándar, aquí **no se utilizan librerías de física**. Toda la detección de colisiones, cálculo de trayectorias y ordenamiento de datos ha sido escrita a mano en bloques de ensamblador (`__asm`), utilizando la FPU (Floating Point Unit) para una precisión matemática superior.
-
-## 📸 Galería
-
-| **Menú Principal con Selector** | **Gameplay (Nivel 1)** |
+| Menú Principal | Gameplay (Nivel 1) |
 |:---:|:---:|
-| ![Menú](./menu.png) | ![Gameplay](./gameplay.png) |
-| *Selector de nivel inicial y modos* | *Motor de física híbrido en acción* |
+| ![Menú](https://github.com/user-attachments/assets/1f8b0d76-23e2-482d-9bdd-52c4cd767028) | ![Gameplay](https://github.com/user-attachments/assets/165bb9c3-bcfa-4c33-9c0c-3631cc51414d) |
+| *Acceso a modos y créditos* | *Física de rebote dinámica* |
 
-| **Tabla de Récords** | **Créditos** |
+| Pantalla de Victoria | Créditos |
 |:---:|:---:|
-| ![Scores](./scores.png) | ![Créditos](./PF_OyAC_13.12.jpg) |
-| *Bubble Sort implementado en ASM* | *Reconocimiento al equipo* |
+| ![Victoria](https://github.com/user-attachments/assets/e5199888-28ce-424d-add2-075768032872) | ![Créditos](https://github.com/user-attachments/assets/b3f93282-b019-43df-a18e-04f445b950a7) |
+| *Mensaje al completar los 10 niveles* | *Reconocimiento a los autores* |
 
 ---
 
-## 🚀 Características Técnicas (El Motor Híbrido)
+## 🚀 Características Técnicas
 
-El núcleo del juego utiliza una arquitectura mixta para maximizar el rendimiento:
+### 🧠 Motor Híbrido C/ASM
+El núcleo del juego combina la facilidad de C para gráficos con la potencia de ASM para lógica:
+* **Física de la Pelota:** Cálculos de trayectoria y velocidad utilizando registros de punto flotante (FPU `fld`, `fstp`, `fadd`).
+* **Sistema de Colisiones:** Detección de impacto AABB optimizada en ensamblador con cálculo de rebotes.
+* **Máquina de Estados:** Gestión del flujo del juego (Menú -> Juego -> Pausa -> Victoria) mediante saltos condicionales (`cmp`, `je`, `jmp`).
+* **Ordenamiento (Bubble Sort):** Implementación manual de ordenamiento de burbuja en ASM para organizar la tabla de puntuaciones (`Hall of Fame`) en tiempo real.
+* **Generación de Mapas:** Lógica de lectura de matrices y asignación de propiedades de ladrillos hecha en bajo nivel.
 
-### 🧠 Lógica en Ensamblador (x86 Inline ASM)
-* **Física Vectorial (FPU):** Cálculo de rebotes y trayectorias usando la pila de registros de punto flotante (`fld`, `fstp`, `fmul`).
-* **Colisiones AABB:** Algoritmo de detección de impacto caja-caja optimizado para reducir ciclos de CPU.
-* **Máquina de Estados:** Gestión del flujo (Menú $\to$ Juego $\to$ Win/Lose) mediante manipulación directa de registros de bandera y saltos condicionales (`cmp`, `je`, `jmp`).
-* **Bubble Sort Nativo:** El sistema de *High Scores* ordena la tabla de puntuaciones manipulando directamente la memoria en tiempo real al finalizar la partida.
+### 🎮 Mecánicas de Juego
+* **10 Niveles Progresivos:** Diseños únicos definidos por matrices de patrones.
+* **Dificultad Personalizable:** Menú de ajustes para modificar la velocidad de la pelota, velocidad de la paleta y nivel inicial.
+* **Resistencia de Ladrillos:** Mecánica de "multigolpe" (indicada por colores) gestionada en memoria.
+* **Física "Factor Caos":** Algoritmo de rebote que introduce micro-perturbaciones aleatorias en el ángulo de la pelota para evitar bucles infinitos.
+* **Persistencia:** Sistema de guardado y lectura de récords en archivo binario (`scores.dat`).
 
-### 🎮 Mecánicas de Juego Actualizadas
-* **10 Niveles Progresivos:** Diseños definidos por matrices con dificultad incremental.
-* **Selector de Nivel:** Permite iniciar la partida desde cualquier nivel desbloqueado o para prácticas (visible en el menú principal).
-* **Dificultad Dinámica:**
-    * Aumento de velocidad (+15%) tras completar cada nivel.
-    * **Resistencia:** Ladrillos de colores avanzados requieren múltiples impactos.
-* **Física "Factor Caos":** Algoritmo que introduce micro-perturbaciones aleatorias en los rebotes para evitar bucles infinitos y aumentar el realismo.
-* **Persistencia:** Sistema de guardado en archivo binario (`scores.dat`).
-
----
+### 🎨 Estética Retro
+* Fuente tipográfica estilo Arcade (`RETRO.TTF`).
+* Renderizado de corazones (vidas) mediante primitivas geométricas (Pixel Art procedural).
+* Interfaz limpia utilizando SDL3_ttf para renderizado de texto de alta calidad.
 
 ## 🕹️ Controles
 
 | Contexto | Tecla | Acción |
 | :--- | :---: | :--- |
-| **Menú** | `Enter` | Iniciar Juego |
-| | `←` / `→` | **Seleccionar Nivel Inicial** |
+| **Menú Principal** | `Enter` | Iniciar Juego |
 | | `Tab` | Ver Mejores Puntuaciones |
+| | `A` | Ajustes (Dificultad/Nivel) |
 | | `C` | Ver Créditos |
 | | `Esc` | Salir |
 | **En Juego** | `←` / `→` | Mover la Paleta |
 | | `Enter` | Pausar / Reanudar |
-| **Final** | `Enter` | Guardar Récord y Continuar |
+| **Ajustes** | `↑` / `↓` | Seleccionar opción |
+| | `←` / `→` | Cambiar valor |
 
 ---
 
-## 🛠️ Instalación y Compilación
+## 🛠️ Guía de Instalación y Compilación
 
-⚠️ **Importante:** Este proyecto requiere compilarse en modo **x86 (32-bits)** debido a que el compilador MSVC de Visual Studio no admite `__asm` bloques en arquitectura x64.
+⚠️ **Requisito Crítico:** Este proyecto utiliza bloques de ensamblador en línea (`__asm`), los cuales **solo son soportados por el compilador MSVC en arquitectura x86 (32-bits)**. Si intentas compilar en x64, obtendrás errores de compilación.
 
-1.  **Clonar el repositorio:**
-    ```bash
-    git clone [https://github.com/TU_USUARIO/oyac-breakout-proyectofinal.git](https://github.com/TU_USUARIO/oyac-breakout-proyectofinal.git)
+### 1. Preparación de Librerías (SDL3)
+El proyecto requiere **SDL3** y **SDL3_ttf**.
+1.  Descargar **SDL3-devel-win32-vc.zip** desde [libsdl.org](https://github.com/libsdl-org/SDL/releases).
+2.  Descargar **SDL3_ttf-devel-vc.zip** desde [el repo de SDL_ttf](https://github.com/libsdl-org/SDL_ttf/releases).
+3.  Descomprimir ambas en una ruta conocida (ej. `C:\Librerias\SDL3` y `C:\Librerias\SDL3_ttf`).
+
+### 2. Configuración en Visual Studio 2022
+Abre `BreakoutGame.sln` y sigue estos pasos:
+
+#### Paso A: Configurar Arquitectura
+En la barra superior de Visual Studio, asegúrate de que el selector de arquitectura diga **x86** (o Win32). **No usar x64**.
+
+#### Paso B: Rutas de Inclusión (Headers)
+* Clic derecho en el proyecto -> **Propiedades**.
+* Ve a **C/C++** -> **General** -> **Additional Include Directories**.
+* Añade las carpetas `include` de tus descargas:
+    * `C:\Librerias\SDL3\include`
+    * `C:\Librerias\SDL3_ttf\include`
+
+#### Paso C: Rutas de Librerías (Libs)
+* Ve a **Linker** -> **General** -> **Additional Library Directories**.
+* Añade las carpetas `lib\x86` de tus descargas:
+    * `C:\Librerias\SDL3\lib\x86`
+    * `C:\Librerias\SDL3_ttf\lib\x86`
+
+#### Paso D: Dependencias (Input)
+* Ve a **Linker** -> **Input** -> **Additional Dependencies**.
+* Escribe manualmente:
+    ```
+    SDL3.lib;SDL3_ttf.lib
     ```
 
-2.  **Requisitos:**
-    * Visual Studio 2022 (Workload: Desarrollo de escritorio con C++).
-    * Librerías **SDL3** y **SDL3_ttf**.
+### 3. Archivos Runtime (DLLs y Assets)
+Para que el juego funcione, el ejecutable necesita encontrar las librerías dinámicas y la fuente.
 
-3.  **Configuración en Visual Studio:**
-    * Abrir `BreakoutGame.sln`.
-    * Seleccionar la configuración **Debug** o **Release** y la plataforma **x86**.
-    * Verificar rutas de inclusión (Include Directories):
-        * `$(SolutionDir)SDL3\include` (Ajustar según tu estructura).
-    * Verificar rutas de librería (Library Directories):
-        * `$(SolutionDir)SDL3\lib\x86`.
+1.  Compila el proyecto (Ctrl + Shift + B).
+2.  Ve a la carpeta donde se creó el `.exe` (usualmente `\Debug` o `\Release`).
+3.  **Copia y pega los siguientes archivos junto al `.exe`**:
+    * `SDL3.dll` (Desde `SDL3\lib\x86`)
+    * `SDL3_ttf.dll` (Desde `SDL3_ttf\lib\x86`)
+    * **`RETRO.TTF`** (Incluido en este repositorio)
 
-4.  **Ejecución:**
-    * Compilar la solución (`Ctrl + Shift + B`).
-    * **Paso Crítico:** Copiar los siguientes archivos a la carpeta donde se generó el `.exe` (usualmente `x86/Debug`):
-        * `SDL3.dll`
-        * `SDL3_ttf.dll`
-        * `RETRO.TTF` (Fuente tipográfica)
-        * `scores.dat` (Si ya existe)
-
----
-
-## 🔮 Roadmap y Mejoras Futuras
-
-Basado en el análisis de rendimiento del proyecto final, se proponen las siguientes optimizaciones para futuras versiones:
-* [ ] **Separación de ASM:** Mover la lógica a archivos externos (`.asm`) compilados con MASM para permitir soporte de 64 bits.
-* [ ] **Instrucciones SIMD:** Implementar instrucciones SSE/AVX para procesar colisiones de múltiples ladrillos en paralelo.
-* [ ] **Partículas:** Sistema de partículas en ASM para efectos visuales al romper ladrillos.
-
----
+> **Nota:** Si el juego no abre o se cierra inmediatamente, verifica que `RETRO.TTF` esté en la misma carpeta que el ejecutable. El código busca la fuente en la ruta relativa actual.
 
 ## 👥 Autores
 
-**Universidad Autónoma de Baja California**
-*Facultad de Ingeniería - Mexicali*
+Proyecto desarrollado con fines académicos para la materia de **Organización y Arquitectura de Computadoras**:
 
-* **💻 Código y Lógica:** Erick Anselmo Moya Monreal
-* **🎨 Diseño y Documentación:** Astrid Yamilet Jiménez Barrera
+* **♥ Astrid Yamilet Jiménez Barrera ♥**
+* **✨ Erick Anselmo Moya Monreal ✨**
 
 ---
 *Hecho con ❤️, C y mucho código ensamblador.*
